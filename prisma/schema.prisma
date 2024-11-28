@@ -1,0 +1,33 @@
+datasource db {
+  provider = "postgresql" // PostgreSQL provider
+  url      = env("DATABASE_URL") // Your Supabase PostgreSQL URL here
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Client {
+  id        Int      @id @default(autoincrement()) // Auto-incremented primary key
+  name      String   // Full name of the client
+  contactNo String   // Phone number
+  email     String   @unique // Email (must be unique)
+  city      String?  // City (optional)
+  password  String   // Hashed password
+  createdAt DateTime @default(now()) // Timestamp for when the record was created
+  updatedAt DateTime @updatedAt      // Auto-updated timestamp for modifications
+  leads     Lead[]   // One-to-many relationship: a client can have multiple leads
+}
+
+model Lead {
+  id           Int      @id @default(autoincrement()) // Auto-incremented primary key
+  name         String   // Lead's name
+  contactNo    String   // Lead's contact number
+  email        String   // Lead's email address
+  city         String?  // Lead's city (optional)
+  status       String   // Current status of the lead (e.g., "New", "In Progress", "Closed")
+  assignedTo   Int      // Client (owner) to whom this lead is assigned (foreign key)
+  client       Client   @relation(fields: [assignedTo], references: [id]) // Link to Client model
+  createdAt    DateTime @default(now()) // Timestamp for lead creation
+  updatedAt    DateTime @updatedAt      // Auto-updated timestamp for lead modifications
+}
